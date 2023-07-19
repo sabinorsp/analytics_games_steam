@@ -96,6 +96,41 @@ class EDA:
         return {val: key for key,value in dic.items() for val in value}
     
 
+    @staticmethod
+    def define_column_type(df,**kwargs):
+        """
+        Transform the type (str,float64,int64) of data about selected columns of dataframe.
+        
+        Args:
+            df (pandas.DataFrame()): dataframe
+            kwargs (dict): Dictionary contain the column name : type of data( str,int64 or float64)
+        
+        Return:
+            pandas.DataFrame(): The modified dataframe.
+            
+        Example: 
+            data = pd.DataFrame({
+                'steam_id':['123','7263',None,'9878'],
+                'title': ['titulo1', 'titulo2', 'titulo3', 'titulo4'],
+                'tag_id_steam':['15123', '123521', '092', '234']
+                })
+            columns_type = {
+                'steam_id':'Int64',
+                'title': 'str',
+                'tag_id_steam': 'Float64',
+                }
+            data = define_type_data(data, **columns_type)
+        """
+        for col in kwargs:
+            if kwargs.get(col).lower() == 'int64':
+                df[col] = pd.to_numeric(df[col]).astype('Int64')
+            elif kwargs.get(col).lower() =='float64':
+                df[col] = pd.to_numeric(df[col]).astype('Float64')
+            elif kwargs.get(col).lower() =='str':
+                df[col] = df[col].astype('str')
+        return df
+
+
 class ML:
 
     def cross_val(X_train: list, y_train: list, n_splits: int) -> float:

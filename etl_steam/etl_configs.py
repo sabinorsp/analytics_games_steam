@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 class EtlSteam:
 
+
     def __init__(self, url: str):
         self.url = url
         self.html_content = ""
@@ -16,6 +17,7 @@ class EtlSteam:
         self.data_prices = pd.DataFrame()
         self.data_reviews = pd.DataFrame()
         self.total_counts = ""
+
 
     def get_summary_data(self) -> None:
         """
