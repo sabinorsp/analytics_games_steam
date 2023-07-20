@@ -73,4 +73,4 @@ obj.total_counts
 total_groups = obj.total_counts//50
 
 # Execute the ETL process.
-scroll_all_games(total_groups,'public')
+scroll_all_games(total_groups,'modelo3')

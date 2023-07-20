@@ -118,11 +118,16 @@ class EtlSteam:
         content = self.html_content
         for tag in content.find_all('a', {'class': 'search_result_row ds_collapse_flag'}):
             try:
-                tag1 = tag.find('span', {'class': 'search_review_summary positive'})
-                if tag1 is None:
-                    tag1 = tag.find('span', {'class': 'search_review_summary mixed'})
-                elif tag1 is None:
-                    tag1 = tag.find('span', {'class': 'search_review_summary negative'})
+                # tag1 = tag.find('span', {'class': 'search_review_summary positive'})
+                # if tag1 is None:
+                #     tag1 = tag.find('span', {'class': 'search_review_summary mixed'})
+                # if tag1 is None:
+                #     tag1 = tag.find('span', {'class': 'search_review_summary negative'})
+                tag1 = (
+                        tag.find('span', {'class': 'search_review_summary positive'}) or 
+                        tag.find('span', {'class': 'search_review_summary mixed'}) or 
+                        tag.find('span', {'class': 'search_review_summary negative'})
+                        )
                 pattern_total_rev = r'the\s+(\d[\d,]*)\s+user'
                 match_total_rev = re.search(pattern_total_rev, tag1.attrs['data-tooltip-html'])
                 if match_total_rev:
