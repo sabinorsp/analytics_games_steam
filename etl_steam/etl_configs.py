@@ -47,7 +47,10 @@ class EtlSteam:
         tagIDs, titles, links = [],[],[]
         content = self.html_content  
         for tag in content.find_all('a', {'class':'search_result_row ds_collapse_flag'}):
-                self.appIDs.append(tag.attrs.get('data-ds-appid'))
+                if tag.attrs.get('data-ds-appid') is not None:
+                    self.appIDs.append(tag.attrs.get('data-ds-appid'))
+                else:
+                    self.appIDs.append(tag.attrs.get('data-ds-bundleid'))
                 tagIDs.append(tag.attrs.get('data-ds-tagids'))
                 links.append(tag.attrs.get('href'))
         for tag in content.find_all('span', {'class':'title'}):
@@ -115,15 +118,18 @@ class EtlSteam:
         content = self.html_content
         for tag in content.find_all('a', {'class': 'search_result_row ds_collapse_flag'}):
             try:
-                tag = tag.find('span', {'class': 'search_review_summary positive'})
-                tag = tag.attrs['data-tooltip-html']
+                tag1 = tag.find('span', {'class': 'search_review_summary positive'})
+                if tag1 is None:
+                    tag1 = tag.find('span', {'class': 'search_review_summary mixed'})
+                elif tag1 is None:
+                    tag1 = tag.find('span', {'class': 'search_review_summary negative'})
                 pattern_total_rev = r'the\s+(\d[\d,]*)\s+user'
-                match_total_rev = re.search(pattern_total_rev, tag)
+                match_total_rev = re.search(pattern_total_rev, tag1.attrs['data-tooltip-html'])
                 if match_total_rev:
                     number_total = match_total_rev.group(1).replace(',', '')
                     reviews.append(number_total)
                 pattern_percent_rev = r'(\d[\d,]*)%'
-                match_percent_rev = re.search(pattern_percent_rev, tag)
+                match_percent_rev = re.search(pattern_percent_rev, tag1.attrs['data-tooltip-html'])
                 if match_percent_rev:
                     number_percent = match_percent_rev.group(1).replace(',', '')
                     positive_rev.append(number_percent)
@@ -131,7 +137,7 @@ class EtlSteam:
                 reviews.append(None)
                 positive_rev.append(None)
         data_reviews = pd.DataFrame({
-            'id_steam': self.appIDs,
+            'steam_id': self.appIDs,
             'total_reviews': reviews,
             'percent_positive_reviews': positive_rev
             })

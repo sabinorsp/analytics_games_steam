@@ -20,23 +20,24 @@ def get_group_data(start:int) -> str:
     return url
 
 
-def save_data_DB(obj: object, first_commit: bool) -> None:
+def save_data_DB(obj: object,schema_name:str, first_commit: bool) -> None:
     """
     Convert the dataframes to tables in a Postgres database using the SQLAlchemy engine.
 
     Args:
         obj (object): Instance of class EtlSteam() with executed method .getsummary_data() 
         first_commit (bool): boolean value: True to mode 'replace' and False to mode 'append'
+        schema_name (str): Schame of DB name.
     """
     mode = 'replace' if first_commit == True else 'append'
-    obj.data_info.to_sql('info', engine, if_exists=mode, index = False)
-    obj.data_prices.to_sql('prices', engine, if_exists=mode, index = False)
-    obj.data_links.to_sql('links', engine, if_exists=mode, index=False )
-    obj.data_reviews.to_sql('reviews', engine, if_exists=mode, index=False)
+    obj.data_info.to_sql(name ='info', con=engine, schema=schema_name ,if_exists=mode, index=True)
+    obj.data_prices.to_sql(name='prices', con=engine, schema=schema_name, if_exists=mode, index=True)
+    obj.data_links.to_sql(name='links', con=engine, schema=schema_name, if_exists=mode, index=True )
+    obj.data_reviews.to_sql(name='reviews', con=engine,schema=schema_name, if_exists=mode, index=True)
     return None
 
 
-def scroll_all_games(total_groups: int) -> str:
+def scroll_all_games(total_groups: int, schema_name: str) -> str:
     """
     Scroll about all list games present in site steam. 
     Execute the ETL process and save by block of 50 games in database
@@ -51,9 +52,9 @@ def scroll_all_games(total_groups: int) -> str:
         etl_steam = EtlSteam(get_group_data(group))
         etl_steam.get_summary_data()
         if group == 0: 
-            save_data_DB(etl_steam, True)
+            save_data_DB(etl_steam,schema_name, True)
         else:
-            save_data_DB(etl_steam,False)
+            save_data_DB(etl_steam,schema_name,False)
         time.sleep(np.random.random())
     return 'Finish ETL!'
 
@@ -72,4 +73,4 @@ obj.total_counts
 total_groups = obj.total_counts//50
 
 # Execute the ETL process.
-scroll_all_games(total_groups)
+scroll_all_games(total_groups,'modelo2')
